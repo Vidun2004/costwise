@@ -12,6 +12,7 @@ import {
   Timestamp,
   updateDoc,
   writeBatch,
+  increment,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { monthKeyFromDate } from "./date";
@@ -21,6 +22,7 @@ export type BillSession = {
   title: string;
   monthKey: string;
   currency: string;
+  itemCount: number;
   createdAt?: Timestamp;
   closedAt?: Timestamp | null;
   convertedToTransactions?: boolean;
@@ -58,6 +60,7 @@ export async function createBillSession(params: {
     title: title?.trim() || `Bills – ${mk}`,
     monthKey: mk,
     currency: currency || "LKR",
+    itemCount: 0,
     createdAt: serverTimestamp(),
     closedAt: null,
     convertedToTransactions: false,
@@ -122,6 +125,10 @@ export async function addBillItem(params: {
     date: Timestamp.fromDate(date),
     createdAt: serverTimestamp(),
   });
+  const sessionRef = doc(db, "users", uid, "billSessions", sessionId);
+  await updateDoc(sessionRef, {
+    itemCount: increment(1),
+  });
 }
 
 export async function listBillItems(uid: string, sessionId: string) {
@@ -149,6 +156,9 @@ export async function deleteBillItem(
   await deleteDoc(
     doc(db, "users", uid, "billSessions", sessionId, "items", itemId),
   );
+  await updateDoc(doc(db, "users", uid, "billSessions", sessionId), {
+    itemCount: increment(-1),
+  });
 }
 
 /**
@@ -184,6 +194,7 @@ export async function saveSessionSummary(params: {
 
   const ref = doc(db, "users", uid, "billSessions", sessionId);
   await updateDoc(ref, {
+    itemCount: count,
     summary: { total, count, biggest, byCategory },
     ...(close ? { closedAt: serverTimestamp() } : {}),
   });
