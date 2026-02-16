@@ -20,6 +20,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Costwise" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/logo_h.svg" type="image/svg+xml" />
       </head>
 
       <body className="min-h-screen">
