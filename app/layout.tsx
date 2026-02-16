@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthProvider } from "./providers";
+import SWRegister from "./sw-register";
 
 export const metadata = {
   title: "Costwise",
@@ -13,8 +14,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <AuthProvider>{children}</AuthProvider>
+      <head>
+        {/* iOS standalone mode */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Costwise" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
+
+      <body className="min-h-screen">
+        <AuthProvider>
+          <SWRegister />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
